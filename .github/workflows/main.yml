@@ -16,23 +16,26 @@ jobs:
       - name: Thiết lập môi trường Theos & Toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y fakechroot curl build-essential libz-dev libssl-dev
+          # Thêm xz-utils để hỗ trợ giải nén định dạng mới
+          sudo apt-get install -y fakechroot curl build-essential libz-dev libssl-dev xz-utils
           
           # 1. Cài đặt Theos
           export THEOS=$GITHUB_WORKSPACE/theos
           echo "THEOS=$THEOS" >> $GITHUB_ENV
           git clone --recursive https://github.com/theos/theos.git $THEOS
           
-          # 2. Tải Toolchain (Sử dụng link mới nhất 2026 - Bản ổn định cho Ubuntu x86_64)
+          # 2. Tải Toolchain (Sử dụng link chính thức tự động lấy bản mới nhất)
           mkdir -p $THEOS/toolchain
-          curl -Lf "https://github.com/kabirober/toolchain-linux-x86_64/releases/download/v1.0/toolchain-linux-x86_64.tar.gz" | tar -xz -C $THEOS/toolchain
+          # Lưu ý: Định dạng tải về là .tar.xz (chuẩn mới nhất của Theos)
+          curl -sL https://github.com/theos/toolchain/releases/latest/download/linux-x86_64.tar.xz -o toolchain.tar.xz
+          tar -xf toolchain.tar.xz -C $THEOS/toolchain
+          rm toolchain.tar.xz
           
           # 3. Cài đặt SDK iOS
           git clone --depth 1 https://github.com/theos/sdks.git $THEOS/sdks
 
       - name: Tiến hành Build Tweak
         run: |
-          # Ép sử dụng Toolchain vừa tải
           export THEOS=$GITHUB_WORKSPACE/theos
           make clean
           make package FINALPACKAGE=1
