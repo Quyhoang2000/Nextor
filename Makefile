@@ -1,12 +1,11 @@
 ARCHS = arm64
 TARGET = iphone:clang:latest:14.0
-# Đảm bảo không dùng các đường dẫn toolchain cứng nhắc trong Makefile
+# Không được set đường dẫn toolchain cứng trong này
 include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = EliteLuxury
 EliteLuxury_FILES = Tweak.xm
 EliteLuxury_FRAMEWORKS = UIKit WebKit Foundation
-# Cờ quan trọng để bỏ qua lỗi protocol và tương thích SDK mới
-EliteLuxury_CFLAGS = -fobjc-arc -Wno-deprecated-declarations -Wno-unused-variable -Wno-protocol -Wno-error
+EliteLuxury_CFLAGS = -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/tweak.mk
