@@ -1,6 +1,7 @@
-ARCHS = arm64
-TARGET = iphone:clang:latest:14.0
-# Không được set đường dẫn toolchain cứng trong này
+export ARCHS = arm64
+# Đừng viết "latest", hãy chỉ định rõ SDK nếu có thể để ổn định
+export TARGET = iphone:clang:14.5:14.0
+
 include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = EliteLuxury
