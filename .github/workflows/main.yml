@@ -1,4 +1,4 @@
-name: Build Elite Luxury v4
+name: Nextor
 
 on:
   push:
@@ -13,24 +13,30 @@ jobs:
       - name: Checkout dự án
         uses: actions/checkout@v4
 
-      - name: Thiết lập môi trường Theos
+      - name: Thiết lập môi trường Theos & Toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y fakechroot
-          # Clone Theos nếu chưa có
-          [ -d theos ] || git clone --recursive https://github.com/theos/theos.git theos
+          sudo apt-get install -y fakechroot curl build-essential libz-dev libssl-dev
           
-      - name: Cài đặt SDK iOS (Fix lỗi No SDKs)
-        run: |
-          # Xóa thư mục sdks cũ nếu nó bị trống hoặc lỗi
-          rm -rf theos/sdks
-          # Clone bộ SDK mới nhất (chỉ lấy bản 14.5 hoặc 16.x để nhẹ và nhanh)
-          git clone --depth 1 https://github.com/theos/sdks.git theos/sdks
+          # 1. Cài đặt Theos
+          export THEOS=$GITHUB_WORKSPACE/theos
+          git clone --recursive https://github.com/theos/theos.git $THEOS
           
+          # 2. Cài đặt Toolchain (Fix lỗi No such file or directory)
+          # Tải bộ biên dịch từ server Theos dành cho Linux
+          curl -LO https://github.com/theos/toolchain/releases/download/linux-arm64/toolchain-linux-arm64.tar.gz
+          mkdir -p $THEOS/toolchain
+          tar -xf toolchain-linux-arm64.tar.gz -C $THEOS/toolchain
+          rm toolchain-linux-arm64.tar.gz
+          
+          # 3. Cài đặt SDK iOS
+          git clone --depth 1 https://github.com/theos/sdks.git $THEOS/sdks
+
       - name: Tiến hành Build Tweak
         run: |
           export THEOS=$GITHUB_WORKSPACE/theos
-          # Lệnh thực thi build bản chính thức
+          # Xóa rác cũ và đóng gói
+          make clean
           make package FINALPACKAGE=1
         
       - name: Lưu trữ và Xuất file .deb
