@@ -3,8 +3,6 @@ name: Build Elite Luxury v4
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -13,17 +11,25 @@ jobs:
 
     steps:
       - name: Checkout dự án
-        uses: actions/checkout@v4 # Cập nhật lên v4
+        uses: actions/checkout@v4
 
       - name: Thiết lập môi trường Theos
         run: |
           sudo apt-get update
           sudo apt-get install -y fakechroot
-          git clone --recursive https://github.com/theos/theos.git $GITHUB_WORKSPACE/theos
+          # Kiểm tra nếu chưa có Theos thì mới clone
+          if [ ! -d "$GITHUB_WORKSPACE/theos" ]; then
+            git clone --recursive https://github.com/theos/theos.git $GITHUB_WORKSPACE/theos
+          fi
           
-      - name: Cài đặt SDK iOS
+      - name: Cài đặt SDK iOS (Sửa lỗi đã tồn tại)
         run: |
-          git clone https://github.com/theos/sdks.git $GITHUB_WORKSPACE/theos/sdks
+          # Kiểm tra nếu thư mục sdks chưa có thì mới clone
+          if [ ! -d "$GITHUB_WORKSPACE/theos/sdks" ]; then
+            git clone --depth 1 https://github.com/theos/sdks.git $GITHUB_WORKSPACE/theos/sdks
+          else
+            echo "SDK đã tồn tại, bỏ qua bước clone."
+          fi
           
       - name: Tiến hành Build Tweak
         run: |
@@ -31,7 +37,7 @@ jobs:
           make package FINALPACKAGE=1
         
       - name: Lưu trữ và Xuất file .deb
-        uses: actions/upload-artifact@v4 # QUAN TRỌNG: Đã đổi v3 thành v4
+        uses: actions/upload-artifact@v4
         with:
           name: Elite-v4-Result
           path: packages/*.deb
