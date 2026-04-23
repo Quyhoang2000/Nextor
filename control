@@ -1,0 +1,9 @@
+Package: com.quyhoang.fxy
+Name: Elite Luxury v4.8
+Depends: mobilesubstrate
+Version: 4.8
+Architecture: iphoneos-arm64
+Description: Menu Hack Elite Hybrid Mode (Online & Offline)
+Maintainer: QuyHoang
+Author: QuyHoang
+Section: Tweaks
