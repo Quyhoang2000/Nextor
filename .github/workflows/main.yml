@@ -16,7 +16,6 @@ jobs:
       - name: Thiết lập môi trường Theos & Toolchain
         run: |
           sudo apt-get update
-          # Thêm xz-utils để hỗ trợ giải nén định dạng mới
           sudo apt-get install -y fakechroot curl build-essential libz-dev libssl-dev xz-utils
           
           # 1. Cài đặt Theos
@@ -24,10 +23,17 @@ jobs:
           echo "THEOS=$THEOS" >> $GITHUB_ENV
           git clone --recursive https://github.com/theos/theos.git $THEOS
           
-          # 2. Tải Toolchain (Sử dụng link chính thức tự động lấy bản mới nhất)
+          # 2. Tải Toolchain (Sử dụng link trực tiếp từ server lưu trữ chính thức)
           mkdir -p $THEOS/toolchain
-          # Lưu ý: Định dạng tải về là .tar.xz (chuẩn mới nhất của Theos)
-          curl -sL https://github.com/theos/toolchain/releases/latest/download/linux-x86_64.tar.xz -o toolchain.tar.xz
+          # Tải bản Toolchain ổn định nhất cho Linux x86_64
+          curl -L "https://github.com/theos/toolchain/releases/download/linux-x86_64/toolchain-linux-x86_64.tar.xz" -o toolchain.tar.xz
+          
+          # Kiểm tra nếu file tải về quá nhỏ (lỗi HTML) thì dừng lại
+          if [ $(stat -c%s "toolchain.tar.xz") -lt 1000000 ]; then
+            echo "Lỗi: File tải về không đúng định dạng toolchain. Kiểm tra lại link!"
+            exit 1
+          fi
+          
           tar -xf toolchain.tar.xz -C $THEOS/toolchain
           rm toolchain.tar.xz
           
