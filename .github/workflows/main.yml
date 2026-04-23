@@ -17,23 +17,20 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y fakechroot
-          # Kiểm tra nếu chưa có Theos thì mới clone
-          if [ ! -d "$GITHUB_WORKSPACE/theos" ]; then
-            git clone --recursive https://github.com/theos/theos.git $GITHUB_WORKSPACE/theos
-          fi
+          # Clone Theos nếu chưa có
+          [ -d theos ] || git clone --recursive https://github.com/theos/theos.git theos
           
-      - name: Cài đặt SDK iOS (Sửa lỗi đã tồn tại)
+      - name: Cài đặt SDK iOS (Fix lỗi No SDKs)
         run: |
-          # Kiểm tra nếu thư mục sdks chưa có thì mới clone
-          if [ ! -d "$GITHUB_WORKSPACE/theos/sdks" ]; then
-            git clone --depth 1 https://github.com/theos/sdks.git $GITHUB_WORKSPACE/theos/sdks
-          else
-            echo "SDK đã tồn tại, bỏ qua bước clone."
-          fi
+          # Xóa thư mục sdks cũ nếu nó bị trống hoặc lỗi
+          rm -rf theos/sdks
+          # Clone bộ SDK mới nhất (chỉ lấy bản 14.5 hoặc 16.x để nhẹ và nhanh)
+          git clone --depth 1 https://github.com/theos/sdks.git theos/sdks
           
       - name: Tiến hành Build Tweak
         run: |
           export THEOS=$GITHUB_WORKSPACE/theos
+          # Lệnh thực thi build bản chính thức
           make package FINALPACKAGE=1
         
       - name: Lưu trữ và Xuất file .deb
