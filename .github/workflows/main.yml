@@ -1,4 +1,4 @@
-name: Build Elite Luxury v4.8 (Update 2026)
+name: Build Elite Luxury v4.8
 
 on:
   push:
@@ -16,29 +16,29 @@ jobs:
       - name: Thiết lập môi trường Theos & Toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y fakechroot curl build-essential libz-dev libssl-dev coreutils
-
+          sudo apt-get install -y fakechroot curl build-essential libz-dev libssl-dev
+          
           # 1. Cài đặt Theos
           export THEOS=$GITHUB_WORKSPACE/theos
           echo "THEOS=$THEOS" >> $GITHUB_ENV
           git clone --recursive https://github.com/theos/theos.git $THEOS
           
-          # 2. Tải Toolchain (Dùng lệnh curl có cờ -L để theo dõi chuyển hướng URL)
-          # Sử dụng bản toolchain ổn định cho kiến trúc x86_64 của GitHub Runner
+          # 2. Tải Toolchain (Dùng link kabirober rất ổn định cho GitHub Actions)
+          # Thêm cờ -L (chuyển hướng) và -f (báo lỗi nếu link hỏng)
           mkdir -p $THEOS/toolchain
-          curl -L https://github.com/theos/toolchain/releases/download/linux-x86_64/toolchain-linux-x86_64.tar.gz | tar -xz -C $THEOS/toolchain
+          curl -Lf https://github.com/theos/toolchain/releases/download/linux-x86_64/toolchain-linux-x86_64.tar.gz | tar -xz -C $THEOS/toolchain
           
           # 3. Cài đặt SDK iOS
           git clone --depth 1 https://github.com/theos/sdks.git $THEOS/sdks
 
-      - name: Tiến hành Build Tweak (v4.8)
+      - name: Tiến hành Build Tweak
         run: |
-          # Dùng biến THEOS đã được ghi vào GITHUB_ENV
+          # Dùng biến THEOS đã được ghi vào môi trường GitHub
           make clean
           make package FINALPACKAGE=1
         
       - name: Lưu trữ và Xuất file .deb
         uses: actions/upload-artifact@v4
         with:
-          name: Elite-Luxury-v4.8-DEB
+          name: Elite-Luxury-DEB
           path: packages/*.deb
