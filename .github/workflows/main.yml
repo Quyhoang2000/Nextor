@@ -1,4 +1,4 @@
-name: Build Elite Luxury v4
+name: Build Elite Luxury v4.8 (Update 2026)
 
 on:
   push:
@@ -16,33 +16,29 @@ jobs:
       - name: Thiết lập môi trường Theos & Toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y fakechroot curl build-essential libz-dev libssl-dev
-          
-          # 1. Thiết lập biến môi trường THEOS
+          sudo apt-get install -y fakechroot curl build-essential libz-dev libssl-dev coreutils
+
+          # 1. Cài đặt Theos
           export THEOS=$GITHUB_WORKSPACE/theos
           echo "THEOS=$THEOS" >> $GITHUB_ENV
-          
-          # 2. Cài đặt Theos
           git clone --recursive https://github.com/theos/theos.git $THEOS
           
-          # 3. Cài đặt Toolchain (Bản Linux x86_64 chuẩn cho GitHub Actions)
-          # Sử dụng bản toolchain từ kabirober (rất ổn định cho GitHub CI)
-          curl -LO https://github.com/theos/toolchain/releases/download/linux-x86_64/toolchain-linux-x86_64.tar.gz
+          # 2. Tải Toolchain (Dùng lệnh curl có cờ -L để theo dõi chuyển hướng URL)
+          # Sử dụng bản toolchain ổn định cho kiến trúc x86_64 của GitHub Runner
           mkdir -p $THEOS/toolchain
-          tar -xf toolchain-linux-x86_64.tar.gz -C $THEOS/toolchain
-          rm toolchain-linux-x86_64.tar.gz
+          curl -L https://github.com/theos/toolchain/releases/download/linux-x86_64/toolchain-linux-x86_64.tar.gz | tar -xz -C $THEOS/toolchain
           
-          # 4. Cài đặt SDK iOS
+          # 3. Cài đặt SDK iOS
           git clone --depth 1 https://github.com/theos/sdks.git $THEOS/sdks
 
-      - name: Tiến hành Build Tweak
+      - name: Tiến hành Build Tweak (v4.8)
         run: |
-          # Sử dụng biến THEOS đã được thiết lập ở bước trước
+          # Dùng biến THEOS đã được ghi vào GITHUB_ENV
           make clean
           make package FINALPACKAGE=1
         
       - name: Lưu trữ và Xuất file .deb
         uses: actions/upload-artifact@v4
         with:
-          name: Elite-v4-Result
+          name: Elite-Luxury-v4.8-DEB
           path: packages/*.deb
