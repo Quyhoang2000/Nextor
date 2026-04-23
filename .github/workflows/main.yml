@@ -13,9 +13,7 @@ jobs:
 
     steps:
       - name: Checkout dự án
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
+        uses: actions/checkout@v4 # Cập nhật lên v4
 
       - name: Thiết lập môi trường Theos
         run: |
@@ -23,19 +21,17 @@ jobs:
           sudo apt-get install -y fakechroot
           git clone --recursive https://github.com/theos/theos.git $GITHUB_WORKSPACE/theos
           
-      - name: Cài đặt SDK iOS (Để không lỗi iOS 14-16)
+      - name: Cài đặt SDK iOS
         run: |
           git clone https://github.com/theos/sdks.git $GITHUB_WORKSPACE/theos/sdks
-          # Lệnh này giúp máy ảo nhận diện được bộ SDK để build dylib
           
-      - name: Tiến hành Build Tweak (Lệnh Main)
+      - name: Tiến hành Build Tweak
         run: |
           export THEOS=$GITHUB_WORKSPACE/theos
-          # Lệnh đóng gói file .deb bản chính thức (v4)
           make package FINALPACKAGE=1
         
       - name: Lưu trữ và Xuất file .deb
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4 # QUAN TRỌNG: Đã đổi v3 thành v4
         with:
           name: Elite-v4-Result
           path: packages/*.deb
