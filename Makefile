@@ -1,12 +1,9 @@
+# Đảm bảo dùng kiến trúc arm64 cho iOS hiện đại
 export ARCHS = arm64
-# Đừng viết "latest", hãy chỉ định rõ SDK nếu có thể để ổn định
+# Target phù hợp với SDK đã tải
 export TARGET = iphone:clang:14.5:14.0
 
 include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = EliteLuxury
-EliteLuxury_FILES = Tweak.xm
-EliteLuxury_FRAMEWORKS = UIKit WebKit Foundation
-EliteLuxury_CFLAGS = -fobjc-arc
-
-include $(THEOS_MAKE_PATH)/tweak.mk
+# ... các dòng code khác của bạn ...
