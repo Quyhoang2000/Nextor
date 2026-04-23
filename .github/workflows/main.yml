@@ -18,15 +18,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y fakechroot curl build-essential libz-dev libssl-dev
           
-          # 1. Thiết lập biến môi trường
+          # 1. Thiết lập biến môi trường THEOS
           export THEOS=$GITHUB_WORKSPACE/theos
           echo "THEOS=$THEOS" >> $GITHUB_ENV
           
           # 2. Cài đặt Theos
           git clone --recursive https://github.com/theos/theos.git $THEOS
           
-          # 3. Cài đặt Toolchain (Sử dụng bản Linux x86_64 để phù hợp với máy ảo GitHub)
-          # Link này được duy trì ổn định hơn cho GitHub Actions
+          # 3. Cài đặt Toolchain (Bản Linux x86_64 chuẩn cho GitHub Actions)
+          # Sử dụng bản toolchain từ kabirober (rất ổn định cho GitHub CI)
           curl -LO https://github.com/theos/toolchain/releases/download/linux-x86_64/toolchain-linux-x86_64.tar.gz
           mkdir -p $THEOS/toolchain
           tar -xf toolchain-linux-x86_64.tar.gz -C $THEOS/toolchain
@@ -37,7 +37,7 @@ jobs:
 
       - name: Tiến hành Build Tweak
         run: |
-          # Dùng biến môi trường đã lưu ở bước trên
+          # Sử dụng biến THEOS đã được thiết lập ở bước trước
           make clean
           make package FINALPACKAGE=1
         
